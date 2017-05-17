@@ -260,9 +260,9 @@ class Template(object):
         return ['Cython']
         
     def build(self):
-        if len(self.ctx['extra_objects']) == 1 and os.path.isfile(self.ctx['extra_objects'][0]):
-            log.info("Use cached build of openzwave")
-            return True
+        # if len(self.ctx['extra_objects']) == 1 and os.path.isfile(self.ctx['extra_objects'][0]):
+        #     log.info("Use cached build of openzwave")
+        #     return True
         log.info("Build openzwave ... be patient ...")
         from subprocess import Popen, PIPE
         from threading import Thread
@@ -378,10 +378,10 @@ class Template(object):
             proc = Popen([ 'gmake', 'install' ], stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
                 
         elif sys.platform.startswith("sunos"):
-            proc = Popen([ 'make', 'install' ], stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
+            proc = Popen('make', stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
 
         elif sys.platform.startswith("linux"):
-            proc = Popen([ 'make', 'install' ], stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
+            proc = Popen('make', stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
 
         else:
             # Unknown systemm
@@ -401,7 +401,6 @@ class Template(object):
         try:
             import pyozw_pkgconfig
             ldpath = pyozw_pkgconfig.libs_only_l('libopenzwave')[2:]
-            log.info("ldconfig openzwave in {0} so ... be patient ...".format(ldpath))
             if sys.platform.startswith("win"):
                 proc = Popen([ 'ldconfig', ldpath ], stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
                     
@@ -415,10 +414,10 @@ class Template(object):
                 proc = Popen([ 'ldconfig', ldpath ], stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
                     
             elif sys.platform.startswith("sunos"):
-                proc = Popen([ 'ldconfig', ldpath ], stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
+                proc = Popen('make', stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
 
             elif sys.platform.startswith("linux"):
-                proc = Popen([ 'ldconfig', ldpath ], stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
+                proc = Popen('make', stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
 
             else:
                 # Unknown systemm
@@ -483,22 +482,22 @@ class Template(object):
                         log.error('{0}\n'.format(line))
 
         if sys.platform.startswith("win"):
-            proc = Popen([ 'make', 'clean' ], stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
+            proc = Popen('make clean', stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
                 
         elif sys.platform.startswith("cygwin"):
-            proc = Popen([ 'make', 'clean' ], stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
+            proc = Popen('make clean', stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
                 
         elif sys.platform.startswith("darwin"):
-            proc = Popen([ 'make', 'clean' ], stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
+            proc = Popen('make clean', stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
                 
         elif sys.platform.startswith("freebsd"):
-            proc = Popen([ 'gmake', 'clean' ], stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
+            proc = Popen('gmake clean', stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
                 
         elif sys.platform.startswith("sunos"):
-            proc = Popen([ 'make', 'clean' ], stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
+            proc = Popen('make', stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
 
         elif sys.platform.startswith("linux"):
-            proc = Popen([ 'make', 'clean' ], stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
+            proc = Popen('make', stdout=PIPE, stderr=PIPE, cwd='{0}'.format(self.openzwave))
 
         else:
             # Unknown systemm
@@ -644,7 +643,7 @@ class DevTemplate(Template):
 class GitTemplate(Template):
     
     def __init__(self, **args):
-        Template.__init__(self, openzwave=os.path.join("openzwave-git", 'open-zwave-master'), **args)
+        Template.__init__(self, openzwave=os.path.join("..", 'open-zwave'), **args)
 
     def get_context(self):
         ctx = cython_context()
@@ -660,7 +659,7 @@ class GitTemplate(Template):
     def clean_all(self):
         ret = self.clean()
         dest,tail = os.path.split(os.path.abspath(self.openzwave))
-        if tail == "openzwave-git":
+        if tail == "openzwave":
             try:
                 log.info('Try to remove {0}'.format(self.openzwave))
                 if os.path.isdir(os.path.abspath(self.openzwave)):

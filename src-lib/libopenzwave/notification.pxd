@@ -61,6 +61,7 @@ cdef extern from "Notification.h" namespace "OpenZWave::Notification":
         Type_Notification = 26                  # A manager notification report.
         Type_DriverRemoved = 27                 # The Driver is being removed. (either due to Error or by request) Do Not Call Any Driver Related Methods after receiving this call.
         Type_ControllerCommand = 28             # When Controller Commands are executed, Notifications of Success/Failure etc are communicated via this Notification * Notification::GetEvent returns Driver::ControllerCommand and Notification::GetNotification returns Driver::ControllerState
+        Type_NotificationRaw = 30
 
 cdef extern from "Notification.h" namespace "OpenZWave::Notification":
 
@@ -86,3 +87,6 @@ cdef extern from "Notification.h" namespace "OpenZWave":
         uint8_t GetSceneId()
         uint8_t GetNotification()
         uint8_t GetByte()
+        string GetRawString()
+        const unsigned char* GetRaw()
+

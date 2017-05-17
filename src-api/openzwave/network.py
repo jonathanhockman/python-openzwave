@@ -280,6 +280,7 @@ class ZWaveNetwork(ZWaveObject):
     SIGNAL_NOTIFICATION = 'Notification'
     SIGNAL_CONTROLLER_COMMAND = 'ControllerCommand'
     SIGNAL_CONTROLLER_WAITING = 'ControllerWaiting'
+    SIGNAL_RAW = 'NotificationRaw'
 
     STATE_STOPPED = 0
     STATE_FAILED = 1
@@ -982,6 +983,8 @@ class ZWaveNetwork(ZWaveObject):
                 self._handle_driver_removed(args)
             elif notify_type == self.SIGNAL_CONTROLLER_COMMAND:
                 self._handle_controller_command(args)
+            elif notify_type == self.SIGNAL_RAW:
+                self._handle_raw(args)
             else:
                 logger.warning(u'Skipping unhandled notification [%s]', args)
         except:
@@ -1611,6 +1614,11 @@ class ZWaveNetwork(ZWaveObject):
         logger.debug(u'Z-Wave Notification MsgComplete : %s', args)
         dispatcher.send(self.SIGNAL_MSG_COMPLETE, \
             **{'network': self})
+
+    def _handle_raw(self, args):
+        logger.debug(u'Z-Wave Raw Notification : %s', args)
+        dispatcher.send(self.SIGNAL_RAW, \
+            **{'network': self, 'raw': args['raw']})
 
     def write_config(self):
         """

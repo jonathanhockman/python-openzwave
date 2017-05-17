@@ -48,6 +48,7 @@ from notification cimport Type_Notification, Type_Group, Type_NodeEvent, Type_Sc
 from notification cimport Type_CreateButton, Type_DeleteButton, Type_ButtonOn, Type_ButtonOff
 from notification cimport Type_ValueAdded, Type_ValueRemoved, Type_ValueChanged, Type_ValueRefreshed
 from notification cimport Type_ControllerCommand
+from notification cimport Type_NotificationRaw
 from notification cimport const_notification, pfnOnNotification_t
 from values cimport ValueGenre, ValueType, ValueID
 from options cimport Options, Create as CreateOptions, OptionType, OptionType_Invalid, OptionType_Bool, OptionType_Int, OptionType_String
@@ -58,6 +59,7 @@ import os
 import sys
 import warnings
 import six
+import binascii
 from shutil import copyfile
 
 # Set default logging handler to avoid "No handler found" warnings.
@@ -197,6 +199,7 @@ PyNotifications = [
     EnumWithDoc('DriverRemoved').setDoc("The Driver is being removed."),
     EnumWithDoc('ControllerCommand').setDoc("When Controller Commands are executed, Notifications of Success/Failure etc are communicated via this Notification."),
     EnumWithDoc('NodeReset').setDoc("A node has been reset from OpenZWave's set.  The Device has been reset and thus removed from the NodeList in OZW."),
+    EnumWithDoc('NotificationRaw').setDoc("Whenever a message is complete this notification is called with the raw payload that was received.")
     ]
 
 PyNotificationCodes = [
@@ -565,6 +568,19 @@ cdef void notif_callback(const_notification _notification, void* _context) with 
             n['valueId'] = {'id' : notification.GetValueID().GetId()}
         except:
             logger.exception("notif_callback exception Type_ValueRemoved")
+            raise
+    elif notification.GetType() == Type_NotificationRaw:
+        try:
+            raw_string = bytes(notification.GetRawString(), 'utf8')
+            raw = [int(raw_string[i:i+2], 16) for i in range(0, len(raw_string), 2)]
+            raw_data = notification.GetRaw()
+            print("{}".format(type(raw_data)))
+            # a = 0
+            # for x in raw_data:
+            #     a = a + x
+            n['raw'] = raw
+        except:
+            logger.exception("notif_callback exception Type_NotificationRaw failed GetRawString()")
             raise
     #elif notification.GetType() in (Type_PollingEnabled, Type_PollingDisabled):
     #    #Maybe we should enable/disable this
